@@ -1,4 +1,7 @@
 #include <stdio.h>
+#include <stack>
+
+#define min(a, b) a < b ? a : b
 
 typedef struct node {
 
@@ -30,9 +33,17 @@ int main() {
 	}
 
 	while(scanf("%d %d", &from, &to) != EOF) {
-		add(adj[from], to);
+		addEdge(adj[from], to);
 	}
 
+	int index = 1;
+	// TODO SCC's storage
+
+	for (int i = 0; i < N; i++) {
+		if (-1 == adj[i]->d) {
+			tarjan(adj[i], N, index); //SCC
+		}
+	}
 
 
 
@@ -41,7 +52,7 @@ int main() {
 
 }
 
-void add(Node from, int to) {
+void addEdge(Node from, int to) {
 
 	Node new = malloc(sizeof(struct node));
 	new->vertix = to;
@@ -52,23 +63,29 @@ void add(Node from, int to) {
 	from->next = new;
 }
 
-void tarjan(Node *adj, int N) {
-	int *lifo;
-	Node[N] scc;
-	int index = 1;
+void tarjan(Node currNode, int N, int &index) {
+	std::stack<Node> lifo;
 
-	for (int i = 0; i < N; i++) {
-		if (adj[i]->d == -1) {
-			adj[i]->d = index;
-			adj[i]->l = index;
-			index++;
+	currNode->d = index;
+	currNode->l = index;
+	index++;
 
-			if (lifo = NULL) {
-				lifo = adj[i];
-			} else {
-				adj[i]
-			}
+	lifo.push(currNode);
+	//curr->onStack = True
+
+	for (Node n = currNode->next; n!=NULL; n = n->next) {
+		if (-1 == n->d) {
+			tarjan(n, N, index);
+			currNode->l = min(currNode->l, n->l);
+		} else if (/*n->onStack*/) {
+			currNode->l = min(currNode->l, n->d);
 		}
 	}
+
+	if (currNode->l == currNode->d) {
+		//criar SCC
+		//pop e add a SCC até currNode (onStack=false)
+	}
+
 
 }
