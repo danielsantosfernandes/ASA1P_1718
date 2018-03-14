@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <iostream>
 #include <stack>
 
 typedef struct vertix {
@@ -15,6 +17,9 @@ typedef struct node {
 	struct node *next;
 	
 } *Node;
+
+void addEdge(Node from, Vertix to);
+Node tarjan(Node currNode, int N, int &index);
 
 
 inline int min(int a, int b) {
@@ -37,27 +42,48 @@ int main() {
 	Node *adj = (Node*)malloc(sizeof(Node)*N);
 	for (i = 0; i < N; i++) {
 		adj[i] = (Node)malloc(sizeof(struct node));
-		adj[i]->vertix = (Vertix)malloc(sizeof(struct vertix))
-		adj[i]->vertix->vnumber = i;
+		adj[i]->vertix = (Vertix)malloc(sizeof(struct vertix));
+		adj[i]->vertix->vnumber = i+1;
 		adj[i]->vertix->d = -1;
 		adj[i]->vertix->l = -1;
 		adj[i]->vertix->onStack = false;
+		adj[i]->next = NULL;
 	}
 
 	while(scanf("%d %d", &from, &to) != EOF) {
-		addEdge(adj[from], adj[to]->vertix);
+		addEdge(adj[from - 1], adj[to - 1]->vertix);
 	}
 
 	int index = 1;
+
+    /*for(i = 0; i < N; i++) {
+	    std::cout << "de: " << adj[i]->vertix->vnumber << "\npara: "<< std::endl;
+	    Node n = adj[i]->next;
+	    while(n != NULL) {
+	        std::cout << n->vertix->vnumber << std::endl;
+	        n = n->next;
+	    }
+    }*/
 
 	Node scc[N];
 	int count = 0;
 
 	for (int i = 0; i < N; i++) {
-		if (-1 == adj[i]->d) {
+		if (-1 == adj[i]->vertix->d) {
 			scc[count++] = tarjan(adj[i], N, index);
 		}
 	}
+
+/*	for(i = 0; i < count; i++) {
+        std::cout << "i: "<< i << std::endl;
+        Node n = scc[i];
+        while(n != NULL) {
+            std::cout << n->vertix->vnumber << std::endl;
+            n = n->next;
+        }
+    }*/
+
+
 
 	return 0;
 
@@ -68,18 +94,17 @@ void addEdge(Node from, Vertix to) {
 	Node n = (Node)malloc(sizeof(struct node));
 	n->vertix = to;
 	n->next = from->next;
-
 	from->next = n;
 }
 
-std::Array<> *tarjan(Node currNode, int N, int &index) {
-	std::stack<Node> lifo;
+Node tarjan(Node currNode, int N, int &index) {
+	std::stack<Vertix> lifo;
 
-	currNode->d = index;
-	currNode->l = index;
+	currNode->vertix->d = index;
+	currNode->vertix->l = index;
 	index++;
 
-	lifo.push(currNode);
+	lifo.push(currNode->vertix);
 	currNode->vertix->onStack = true;
 
 	for (Node n = currNode->next; n!=NULL; n = n->next) {
@@ -100,7 +125,11 @@ std::Array<> *tarjan(Node currNode, int N, int &index) {
 			temp = n;
 			n = (Node)malloc(sizeof(struct node));
 			n->next = temp;
-			n->vertix = lifo.pop();
+			n->vertix = lifo.top();
+			lifo.pop();
+			if (NULL == n->vertix) {
+			    return NULL;
+			}
 			n->vertix->onStack = false;
 		} while (n->vertix != currNode->vertix);
 
