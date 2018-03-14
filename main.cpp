@@ -1,15 +1,25 @@
 #include <stdio.h>
 #include <stack>
 
-#define min(a, b) a < b ? a : b
+typedef struct vertix {
+
+	int vnumber;
+	int d, l;
+	bool onStack;
+
+} *Vertix;
 
 typedef struct node {
 
-	const int vertix;
-	int d, l;
+	Vertix vertix;
 	struct node *next;
 	
 } *Node;
+
+
+inline int min(int a, int b) {
+	return a < b ? a : b;
+}
 
 int main() {
 
@@ -24,20 +34,22 @@ int main() {
 	scanf("%d", &N);
 	scanf("%d", &M);
 
-	Node *adj = malloc(sizeof(Node)*N);
+	Node *adj = (Node*)malloc(sizeof(Node)*N);
 	for (i = 0; i < N; i++) {
-		adj[i] = malloc(sizeof(struct Node));
-		adj[i]->vertix = i;
-		adj[i]->d = -1;
-		adj[i]->l = -1;
+		adj[i] = (Node)malloc(sizeof(struct node));
+		adj[i]->vertix = (Vertix)malloc(sizeof(struct vertix))
+		adj[i]->vertix->vnumber = i;
+		adj[i]->vertix->d = -1;
+		adj[i]->vertix->l = -1;
+		adj[i]->vertix->onStack = false;
 	}
 
 	while(scanf("%d %d", &from, &to) != EOF) {
-		addEdge(adj[from], to);
+		addEdge(adj[from], adj[to]->vertix);
 	}
 
 	int index = 1;
-	// TODO SCC's storage
+
 
 	for (int i = 0; i < N; i++) {
 		if (-1 == adj[i]->d) {
@@ -45,25 +57,20 @@ int main() {
 		}
 	}
 
-
-
-
 	return 0;
 
 }
 
-void addEdge(Node from, int to) {
+void addEdge(Node from, Vertix to) {
 
-	Node new = malloc(sizeof(struct node));
-	new->vertix = to;
-	new->next = from->next;
-	new->d = -1;
-	new->l = -1;
+	Node n = (Node)malloc(sizeof(struct node));
+	n->vertix = to;
+	n->next = from->next;
 
-	from->next = new;
+	from->next = n;
 }
 
-void tarjan(Node currNode, int N, int &index) {
+Node* tarjan(Node currNode, int N, int &index) {
 	std::stack<Node> lifo;
 
 	currNode->d = index;
@@ -71,20 +78,25 @@ void tarjan(Node currNode, int N, int &index) {
 	index++;
 
 	lifo.push(currNode);
-	//curr->onStack = True
+	currNode->vertix->onStack = true;
 
 	for (Node n = currNode->next; n!=NULL; n = n->next) {
-		if (-1 == n->d) {
+		if (-1 == n->vertix->d) {
 			tarjan(n, N, index);
-			currNode->l = min(currNode->l, n->l);
-		} else if (/*n->onStack*/) {
-			currNode->l = min(currNode->l, n->d);
+			currNode->vertix->l = min(currNode->vertix->l, n->vertix->l);
+		} else if (n->vertix->onStack) {
+			currNode->vertix->l = min(currNode->vertix->l, n->vertix->d);
 		}
 	}
 
-	if (currNode->l == currNode->d) {
-		//criar SCC
-		//pop e add a SCC até currNode (onStack=false)
+	if (currNode->vertix->l == currNode->vertix->d) {
+		Node *scc = (Node*)malloc(sizeof(Node)*index); //nao quero fazer isto. Entao quero fazer o que?
+		
+		for (int i = 0; (scc[i] = lifo.pop()) != curr; i++) {
+			scc[i]->onStack = false;
+		}
+
+		return scc;
 	}
 
 
