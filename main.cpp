@@ -50,10 +50,12 @@ int main() {
 
 	int index = 1;
 
+	Node scc[N];
+	int count = 0;
 
 	for (int i = 0; i < N; i++) {
 		if (-1 == adj[i]->d) {
-			tarjan(adj[i], N, index); //SCC
+			scc[count++] = tarjan(adj[i], N, index);
 		}
 	}
 
@@ -70,7 +72,7 @@ void addEdge(Node from, Vertix to) {
 	from->next = n;
 }
 
-Node* tarjan(Node currNode, int N, int &index) {
+std::Array<> *tarjan(Node currNode, int N, int &index) {
 	std::stack<Node> lifo;
 
 	currNode->d = index;
@@ -90,13 +92,19 @@ Node* tarjan(Node currNode, int N, int &index) {
 	}
 
 	if (currNode->vertix->l == currNode->vertix->d) {
-		Node *scc = (Node*)malloc(sizeof(Node)*index); //nao quero fazer isto. Entao quero fazer o que?
 		
-		for (int i = 0; (scc[i] = lifo.pop()) != curr; i++) {
-			scc[i]->onStack = false;
-		}
+		Vertix v;
+		Node temp, n = NULL;
 
-		return scc;
+		do {
+			temp = n;
+			n = (Node)malloc(sizeof(struct node));
+			n->next = temp;
+			n->vertix = lifo.pop();
+			n->vertix->onStack = false;
+		} while (n->vertix != currNode->vertix);
+
+		return n;
 	}
 
 
