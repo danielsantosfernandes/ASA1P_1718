@@ -19,7 +19,7 @@ typedef struct node {
 } *Node;
 
 void addEdge(Node from, Vertix to);
-Node tarjan(Node currNode, int N, int &index);
+Node tarjan(Node*, int, int, int);
 
 
 inline int min(int a, int b) {
@@ -70,7 +70,7 @@ int main() {
 
 	for (int i = 0; i < N; i++) {
 		if (-1 == adj[i]->vertix->d) {
-			scc[count++] = tarjan(adj[i], N, index);
+			scc[count++] = tarjan(adj, i, N, index);
 		}
 	}
 
@@ -97,26 +97,26 @@ void addEdge(Node from, Vertix to) {
 	from->next = n;
 }
 
-Node tarjan(Node currNode, int N, int &index) {
+Node tarjan(Node* adj, int currNode, int N, int &index) {
 	std::stack<Vertix> lifo;
 
-	currNode->vertix->d = index;
-	currNode->vertix->l = index;
+	adj[currNode]->vertix->d = index;
+	adj[currNode]->vertix->l = index;
 	index++;
 
-	lifo.push(currNode->vertix);
-	currNode->vertix->onStack = true;
+	lifo.push(adj[currNode]->vertix);
+	adj[currNode]->vertix->onStack = true;
 
-	for (Node n = currNode->next; n!=NULL; n = n->next) {
+	for (Node n = adj[currNode]->next; n!=NULL; n = n->next) {
 		if (-1 == n->vertix->d) {
-			tarjan(n, N, index);
-			currNode->vertix->l = min(currNode->vertix->l, n->vertix->l);
+			tarjan(adj, n->vertix->d, N, index);
+			adj[currNode]->vertix->l = min(adj[currNode]->vertix->l, n->vertix->l);
 		} else if (n->vertix->onStack) {
-			currNode->vertix->l = min(currNode->vertix->l, n->vertix->d);
+			adj[currNode]->vertix->l = min(adj[currNode]->vertix->l, n->vertix->d);
 		}
 	}
 
-	if (currNode->vertix->l == currNode->vertix->d) {
+	if (adj[currNode]->vertix->l == adj[currNode]->vertix->d) {
 		
 		Vertix v;
 		Node temp, n = NULL;
@@ -131,7 +131,7 @@ Node tarjan(Node currNode, int N, int &index) {
 			    return NULL;
 			}
 			n->vertix->onStack = false;
-		} while (n->vertix != currNode->vertix);
+		} while (n->vertix != adj[currNode]->vertix);
 
 		return n;
 	}
