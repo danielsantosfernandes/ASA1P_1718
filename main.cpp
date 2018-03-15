@@ -74,14 +74,14 @@ int main() {
 		}
 	}
 
-/*	for(i = 0; i < count; i++) {
+	for(i = 0; i < count; i++) {
         std::cout << "i: "<< i << std::endl;
         Node n = scc[i];
         while(n != NULL) {
             std::cout << n->vertix->vnumber << std::endl;
             n = n->next;
         }
-    }*/
+    }
 
 
 
