@@ -19,7 +19,7 @@ typedef struct node {
 } *Node;
 
 void addEdge(Node from, Vertix to);
-Node tarjan(Node*, int, int, int&, std::stack<Vertix>*);
+void tarjan(Node*, int, int, int&, std::stack<Vertix>*, Node*, int&);
 
 
 inline int min(int a, int b) {
@@ -66,23 +66,23 @@ int main() {
     }*/
 
 	Node scc[N];
-	int count = 0;
+	int sccCount = 0;
 	std::stack<Vertix> lifo;
 
 	for (int i = 0; i < N; i++) {
 		if (-1 == adj[i]->vertix->d) {
-			scc[count++] = tarjan(adj, i, N, index, &lifo);
+			tarjan(adj, i, N, index, &lifo, scc, sccCount);
 		}
 	}
 
-/*	for(i = 0; i < count; i++) {
+	for(i = 0; i < sccCount; i++) {
         std::cout << "i: "<< i << std::endl;
         Node n = scc[i];
         while(n != NULL) {
             std::cout << n->vertix->vnumber << std::endl;
             n = n->next;
         }
-    }*/
+    }
 
 
 
@@ -97,19 +97,19 @@ void addEdge(Node from, Vertix to) {
 	n->next = from->next;
 	from->next = n;
 }
-
-Node tarjan(Node* adj, int currNode, int N, int &index, std::stack<Vertix> *lifo) {
+//          grafo      node orig     N Vs   stack index                  stack
+void tarjan(Node* adj, int currNode, int N, int &index, std::stack<Vertix> *lifo, Node *scc, int &sccCount) {
 
 	adj[currNode]->vertix->d = index;
 	adj[currNode]->vertix->l = index;
 	index++;
 
-	lifo->push(adj[currNode]->vertix); //std::cout << "push " << currNode + 1 << std::endl;
+	lifo->push(adj[currNode]->vertix); std::cout << "push " << currNode + 1 << std::endl;
 	adj[currNode]->vertix->onStack = true;
 
 	for (Node n = adj[currNode]->next; n!=NULL; n = n->next) {
 		if (-1 == n->vertix->d) {
-			tarjan(adj, n->vertix->vnumber - 1, N, index, lifo);
+			tarjan(adj, n->vertix->vnumber - 1, N, index, lifo, scc, sccCount);
 			adj[currNode]->vertix->l = min(adj[currNode]->vertix->l, n->vertix->l);
 		} else if (n->vertix->onStack) {
 			adj[currNode]->vertix->l = min(adj[currNode]->vertix->l, n->vertix->d);
@@ -117,24 +117,23 @@ Node tarjan(Node* adj, int currNode, int N, int &index, std::stack<Vertix> *lifo
 	}
 
 	if (adj[currNode]->vertix->l == adj[currNode]->vertix->d) {
-		
-		Vertix v;
+
 		Node temp, n = NULL;
 
 		do {
 			temp = n;
 			n = (Node)malloc(sizeof(struct node));
 			n->next = temp;
-			n->vertix = lifo->top(); //std::cout << "pop " << lifo->top()->vnumber << std::endl;
+			n->vertix = lifo->top(); std::cout << "pop " << lifo->top()->vnumber << std::endl;
 			lifo->pop();
-			if (NULL == n->vertix) { //std::cout << "oioi" << std::endl;
+/*			if (NULL == n->vertix) { std::cout << "isto é mau (130)" << std::endl;
 			    return NULL;
-			}
+			}*/
 			n->vertix->onStack = false;
-			//std::cout << n->vertix->vnumber << adj[currNode]->vertix->vnumber << std::endl;
+			std::cout << n->vertix->vnumber << adj[currNode]->vertix->vnumber << std::endl;
 		} while (n->vertix != adj[currNode]->vertix);
 
-		return n;
+		scc[sccCount++] = n;
 	}
 
 
