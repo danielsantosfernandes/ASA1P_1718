@@ -8,6 +8,7 @@ typedef struct vertix {
 	int vnumber;
 	int d, l;
 	bool onStack;
+	int sccn;
 
 } *Vertix;
 
@@ -43,10 +44,11 @@ int main() {
 	for (i = 0; i < N; i++) {
 		adj[i] = (Node)malloc(sizeof(struct node));
 		adj[i]->vertix = (Vertix)malloc(sizeof(struct vertix));
-		adj[i]->vertix->vnumber = i+1;
+		adj[i]->vertix->vnumber = i + 1;
 		adj[i]->vertix->d = -1;
 		adj[i]->vertix->l = -1;
 		adj[i]->vertix->onStack = false;
+		adj[i]->vertix->sccn = -1;
 		adj[i]->next = NULL;
 	}
 
@@ -75,7 +77,7 @@ int main() {
 		}
 	}
 
-	for(i = 0; i < sccCount; i++) {
+	for(i = 0; i < sccCount; i++) {  //para controlo apenas
         std::cout << "i: "<< i << std::endl;
         Node n = scc[i];
         while(n != NULL) {
@@ -84,10 +86,18 @@ int main() {
         }
     }
 
+    Node *connections = (Node*)malloc(sizeof(Node)*sccCount);
+
     for (i = 0; i < sccCount; i++) {
     	Node n = scc[i];
         while(n != NULL) {
-            
+        	Node curr = adj[n->vertix->vnumber - 1];
+            for (Node m = curr->next; m != NULL; m = m->next) {
+            	if (curr->vertix->vnumber != m->vertix->vnumber) {
+            		//aqui tenho de adicionar o m->vertix `a lista ligada com inicio em connections[i], preferencialmente ordenada/m
+            	}
+
+            }
             n = n->next;
         }
     }
@@ -144,6 +154,7 @@ void tarjan(Node* adj, int currNode, int N, int &index, std::stack<Vertix> *lifo
 				n->next->vertix->onStack = false;
 				aux = n->next;
 			}
+			aux->vertix->sccn = sccCount;
 			lifo->pop();
 			//std::cout << n->vertix->vnumber << adj[currNode]->vertix->vnumber << std::endl; NOT UTIL bc of else
 		} while (aux->vertix != adj[currNode]->vertix);
