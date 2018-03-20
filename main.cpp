@@ -38,8 +38,8 @@ int main() {
 	int N, M;
 	int from, to, i;
 
-	scanf("%d", &N);
-	scanf("%d", &M);
+	if(1 != scanf("%d", &N)) return 1;
+	if(1 != scanf("%d", &M)) return 1;
 
 	Node *adj = (Node*)malloc(sizeof(Node)*N);
 	for (i = 0; i < N; i++) {
@@ -78,14 +78,14 @@ int main() {
 		}
 	}
 
-	for(i = 0; i < sccCount; i++) {  //para controlo apenas
+	/*for(i = 0; i < sccCount; i++) {  //para controlo apenas
     std::cout << "i: "<< i << std::endl;
     Node n = scc[i];
     while(n != NULL) {
       std::cout << n->vertix->vnumber << std::endl;
       n = n->next;
     }
-  }
+  }*/
 
   Node *connections = (Node*)malloc(sizeof(Node)*sccCount);
 	for (i = 0; i < sccCount; i++) {
@@ -94,30 +94,29 @@ int main() {
 		connections[i]->next = NULL;
 	}
 
-	printf("\n--//--\n\n");
+	//printf("\n--//--\n\n");
 	int connectionsCounter = 0;
 
   for (i = 0; i < sccCount; i++) {  //percorro lista de scc
   	Node n;
     for (n = scc[i]; n != NULL; n = n->next) {              //percorro nodes da scc
       Node curr = adj[n->vertix->vnumber - 1];
-      for (Node m = curr->next; m != NULL; m = m->next) {         printf("%d -> %d\n", curr->vertix->vnumber, m->vertix->vnumber); //percorro ligacoes de cada vertix da scc
-	      if (curr->vertix->sccn != m->vertix->sccn) {              printf("sim\n");
+      for (Node m = curr->next; m != NULL; m = m->next) {         //printf("%d -> %d\n", curr->vertix->vnumber, m->vertix->vnumber); //percorro ligacoes de cada vertix da scc
+	      if (curr->vertix->sccn != m->vertix->sccn) {              //printf("sim\n");
 	      	//aqui tenho de adicionar o m->vertix `a lista ligada com inicio em connections[i], preferencialmente ordenada/m
-					if (NULL == connections[i]->next) {                     printf("oii 103\n");
+					if (NULL == connections[i]->next) {                     //printf("oii 103\n");
 						connections[i]->next = (Node)malloc(sizeof(struct node));
 						connections[i]->next->vertix = scc[m->vertix->sccn - 1]->vertix;
-						connections[i]->next->next = NULL;                    printf("..%d -> %d\n\n", connections[i]->vertix->vnumber, connections[i]->next->vertix->vnumber);
+						connections[i]->next->next = NULL;                    //printf("..%d -> %d\n\n", connections[i]->vertix->vnumber, connections[i]->next->vertix->vnumber);
 						connectionsCounter++;
-					} else {                                                printf("oii 108\n");
+					} else {                                                //printf("oii 108\n");
 						Node r;
-						for (r = connections[i]->next; r->next != NULL && scc[r->next->vertix->sccn - 1]->vertix->vnumber < scc[m->vertix->sccn - 1]->vertix->vnumber; r = r->next, printf("%d < %d\n", scc[r->next->vertix->sccn - 1]->vertix->vnumber, scc[m->vertix->sccn - 1]->vertix->vnumber)) {printf("PUTA\n");};
+						for (r = connections[i]->next; r->next != NULL && scc[r->next->vertix->sccn - 1]->vertix->vnumber < scc[m->vertix->sccn - 1]->vertix->vnumber; r = r->next);
 						if (r->next == NULL || scc[r->vertix->sccn - 1]->vertix->vnumber != scc[m->vertix->sccn - 1]->vertix->vnumber) {
-							                                                    if(r->next!=NULL) printf("%dpila%d\n", scc[r->vertix->sccn - 1]->vertix->vnumber, scc[m->vertix->sccn - 1]->vertix->vnumber);
 							Node p = (Node)malloc(sizeof(struct node));
 							p->next = r->next;
 							r->next = p;
-							p->vertix = scc[m->vertix->sccn - 1]->vertix;       printf("..%d -> %d\n\n", connections[i]->vertix->vnumber, p->vertix->vnumber); 
+							p->vertix = scc[m->vertix->sccn - 1]->vertix;       //printf("..%d -> %d\n\n", connections[i]->vertix->vnumber, p->vertix->vnumber); 
 							connectionsCounter++;
 						}
 					}
@@ -160,7 +159,7 @@ void tarjan(Node* adj, int currNode, int N, int &index, std::stack<Vertix> *lifo
 	adj[currNode]->vertix->l = index;
 	index++;
 
-	lifo->push(adj[currNode]->vertix); std::cout << "push " << currNode + 1 << std::endl;
+	lifo->push(adj[currNode]->vertix);
 	adj[currNode]->vertix->onStack = true;
 
 	for (Node n = adj[currNode]->next; n!=NULL; n = n->next) {
@@ -181,20 +180,19 @@ void tarjan(Node* adj, int currNode, int N, int &index, std::stack<Vertix> *lifo
 				aux = n;
 				n = (Node)malloc(sizeof(struct node));
 				n->next = aux;
-				n->vertix = lifo->top();      std::cout << "pop " << lifo->top()->vnumber << std::endl;
+				n->vertix = lifo->top();
 				n->vertix->onStack = false;
 				aux = n;
 			} else {
 				aux = n->next;
 				n->next = (Node)malloc(sizeof(struct node));
 				n->next->next = aux;
-				n->next->vertix = lifo->top();   std::cout << "pop " << lifo->top()->vnumber << std::endl;
+				n->next->vertix = lifo->top();
 				n->next->vertix->onStack = false;
 				aux = n->next;
 			}
 			aux->vertix->sccn = sccCount + 1;
 			lifo->pop();
-			//std::cout << n->vertix->vnumber << adj[currNode]->vertix->vnumber << std::endl; NOT UTIL bc of else
 		} while (aux->vertix != adj[currNode]->vertix);
 
 		scc[sccCount++] = n;
