@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <iostream>
 #include <stack>
+#include <algorithm>
 
 typedef struct vertix {
 
@@ -93,11 +94,12 @@ int main() {
 		connections[i]->next = NULL;
 	}
 
-	printf("\n\n");
+	printf("\n--//--\n\n");
+	int connectionsCounter = 0;
 
   for (i = 0; i < sccCount; i++) {  //percorro lista de scc
-  	Node n = scc[i];
-    while(n != NULL) {              //percorro nodes da scc
+  	Node n;
+    for (n = scc[i]; n != NULL; n = n->next) {              //percorro nodes da scc
       Node curr = adj[n->vertix->vnumber - 1];
       for (Node m = curr->next; m != NULL; m = m->next) {         printf("%d -> %d\n", curr->vertix->vnumber, m->vertix->vnumber); //percorro ligacoes de cada vertix da scc
 	      if (curr->vertix->sccn != m->vertix->sccn) {              printf("sim\n");
@@ -106,7 +108,7 @@ int main() {
 						connections[i]->next = (Node)malloc(sizeof(struct node));
 						connections[i]->next->vertix = scc[m->vertix->sccn - 1]->vertix;
 						connections[i]->next->next = NULL;                    printf("..%d -> %d\n\n", connections[i]->vertix->vnumber, connections[i]->next->vertix->vnumber);
-
+						connectionsCounter++;
 					} else {                                                printf("oii 108\n");
 						Node r;
 						for (r = connections[i]->next; r->next != NULL && scc[r->next->vertix->sccn - 1]->vertix->vnumber < scc[m->vertix->sccn - 1]->vertix->vnumber; r = r->next, printf("%d < %d\n", scc[r->next->vertix->sccn - 1]->vertix->vnumber, scc[m->vertix->sccn - 1]->vertix->vnumber)) {printf("PUTA\n");};
@@ -116,13 +118,20 @@ int main() {
 							p->next = r->next;
 							r->next = p;
 							p->vertix = scc[m->vertix->sccn - 1]->vertix;       printf("..%d -> %d\n\n", connections[i]->vertix->vnumber, p->vertix->vnumber); 
+							connectionsCounter++;
 						}
 					}
 	      }
       }
-      n = n->next;
     }
   }
+
+  std::sort(connections, connections + sccCount, [](Node x, Node y) { 
+  	return x->vertix->vnumber < y->vertix->vnumber;
+  });
+
+  printf("%d\n", sccCount);
+  printf("%d\n", connectionsCounter);
 
 	for (i = 0; i < sccCount; i++) {
 		Node n;
