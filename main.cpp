@@ -111,8 +111,8 @@ int main() {
 						connectionsCounter++;
 					} else {                                                //printf("oii 108\n");
 						Node r;
-						for (r = connections[i]->next; r->next != NULL && scc[r->next->vertix->sccn - 1]->vertix->vnumber < scc[m->vertix->sccn - 1]->vertix->vnumber; r = r->next);
-						if (r->next == NULL || scc[r->vertix->sccn - 1]->vertix->vnumber != scc[m->vertix->sccn - 1]->vertix->vnumber) {
+						for (r = connections[i]; r->next != NULL && scc[r->next->vertix->sccn - 1]->vertix->vnumber < scc[m->vertix->sccn - 1]->vertix->vnumber; /*printf("%d < %d\n", scc[r->next->vertix->sccn - 1]->vertix->vnumber, scc[m->vertix->sccn - 1]->vertix->vnumber),*/ r = r->next);
+						if (r->next == NULL || scc[r->next->vertix->sccn - 1]->vertix->vnumber != scc[m->vertix->sccn - 1]->vertix->vnumber) {
 							Node p = (Node)malloc(sizeof(struct node));
 							p->next = r->next;
 							r->next = p;
