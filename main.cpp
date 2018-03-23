@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <iostream>
 #include <stack>
 #include <algorithm>
 
@@ -59,16 +58,7 @@ int main() {
 
 	int index = 1;
 
-    /*for(i = 0; i < N; i++) {
-	    std::cout << "de: " << adj[i]->vertix->vnumber << "\npara: "<< std::endl;
-	    Node n = adj[i]->next;
-	    while(n != NULL) {
-	        std::cout << n->vertix->vnumber << std::endl;
-	        n = n->next;
-	    }
-    }*/
-
-	Node scc[N];
+	Node *scc = (Node*)malloc(sizeof(Node)*N);
 	int sccCount = 0;
 	std::stack<Vertix> lifo;
 
@@ -78,15 +68,6 @@ int main() {
 		}
 	}
 
-	/*for(i = 0; i < sccCount; i++) {  //para controlo apenas
-    std::cout << "i: "<< i << std::endl;
-    Node n = scc[i];
-    while(n != NULL) {
-      std::cout << n->vertix->vnumber << std::endl;
-      n = n->next;
-    }
-  }*/
-
   Node *connections = (Node*)malloc(sizeof(Node)*sccCount);
 	for (i = 0; i < sccCount; i++) {
 		connections[i] = (Node)malloc(sizeof(struct node));
@@ -94,29 +75,29 @@ int main() {
 		connections[i]->next = NULL;
 	}
 
-	//printf("\n--//--\n\n");
+
 	int connectionsCounter = 0;
 
-  for (i = 0; i < sccCount; i++) {  //percorro lista de scc
+  for (i = 0; i < sccCount; i++) {                                //percorro lista de scc
   	Node n;
-    for (n = scc[i]; n != NULL; n = n->next) {              //percorro nodes da scc
+    for (n = scc[i]; n != NULL; n = n->next) {                    //percorro nodes da scc
       Node curr = adj[n->vertix->vnumber - 1];
-      for (Node m = curr->next; m != NULL; m = m->next) {         //printf("%d -> %d\n", curr->vertix->vnumber, m->vertix->vnumber); //percorro ligacoes de cada vertix da scc
-	      if (curr->vertix->sccn != m->vertix->sccn) {              //printf("sim\n");
+      for (Node m = curr->next; m != NULL; m = m->next) {         //percorro ligacoes de cada vertix da scc
+	      if (curr->vertix->sccn != m->vertix->sccn) {
 	      	//aqui tenho de adicionar o m->vertix `a lista ligada com inicio em connections[i], preferencialmente ordenada/m
-					if (NULL == connections[i]->next) {                     //printf("oii 103\n");
+					if (NULL == connections[i]->next) {
 						connections[i]->next = (Node)malloc(sizeof(struct node));
 						connections[i]->next->vertix = scc[m->vertix->sccn - 1]->vertix;
-						connections[i]->next->next = NULL;                    //printf("..%d -> %d\n\n", connections[i]->vertix->vnumber, connections[i]->next->vertix->vnumber);
+						connections[i]->next->next = NULL;
 						connectionsCounter++;
-					} else {                                                //printf("oii 108\n");
+					} else {
 						Node r;
-						for (r = connections[i]; r->next != NULL && scc[r->next->vertix->sccn - 1]->vertix->vnumber < scc[m->vertix->sccn - 1]->vertix->vnumber; /*printf("%d < %d\n", scc[r->next->vertix->sccn - 1]->vertix->vnumber, scc[m->vertix->sccn - 1]->vertix->vnumber),*/ r = r->next);
+						for (r = connections[i]; r->next != NULL && scc[r->next->vertix->sccn - 1]->vertix->vnumber < scc[m->vertix->sccn - 1]->vertix->vnumber; r = r->next);
 						if (r->next == NULL || scc[r->next->vertix->sccn - 1]->vertix->vnumber != scc[m->vertix->sccn - 1]->vertix->vnumber) {
 							Node p = (Node)malloc(sizeof(struct node));
 							p->next = r->next;
 							r->next = p;
-							p->vertix = scc[m->vertix->sccn - 1]->vertix;       //printf("..%d -> %d\n\n", connections[i]->vertix->vnumber, p->vertix->vnumber); 
+							p->vertix = scc[m->vertix->sccn - 1]->vertix;
 							connectionsCounter++;
 						}
 					}
@@ -138,6 +119,46 @@ int main() {
 			printf("%d %d\n", connections[i]->vertix->vnumber, scc[n->vertix->sccn-1]->vertix->vnumber);
 		}
 	}
+
+/*	//FREES
+
+
+	for (i = 0; i < sccCount; i++) {
+		Node aux, z;
+		for (z = aux = connections[i]->next; z != NULL; aux = z) {
+			z = z->next;
+			free(aux); 
+		}
+		free(connections[i]);
+	}
+	free(connections);
+
+	for (i = 0; i < sccCount; i++) {
+		Node aux, z;
+		for (z = aux = scc[i]->next; z != NULL; aux = z) {
+			z = z->next;
+			free(aux); 
+		}
+		free(scc[i]);
+	}
+	free(scc);
+
+
+
+	for (i = 0; i < N; i++) {
+		Node aux, z;
+		for (z = aux = adj[i]->next; z != NULL; aux = z) {
+			z = z->next;
+			free(aux->vertix);
+			free(aux); 
+		}
+		free(adj[i]);
+	}
+	free(adj);*/
+
+
+
+	
 
 
 
